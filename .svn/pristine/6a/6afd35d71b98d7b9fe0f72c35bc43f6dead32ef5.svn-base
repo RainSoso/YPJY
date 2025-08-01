@@ -1,0 +1,145 @@
+body {
+  font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+}
+
+.text-blue {
+  color: #0986b0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-red {
+  color: red;
+}
+
+.text-green {
+  color: green;
+}
+
+.bg-white {
+  background-color: #fff;
+}
+
+.font-600 {
+  font-weight: 600;
+}
+
+.font-400 {
+  font-weight: 400;
+}
+
+.font-16 {
+  font-size: 16px;
+}
+
+.my-table {
+  width: 100%;
+  table-layout: fixed;
+  border-left: 1px solid #f0f0f0;
+  border-top: 1px solid #f0f0f0;
+
+  & > tr:nth-child(2n),
+  & > tbody > tr:nth-child(2n){
+    background-color: #fafafa;
+  }
+
+  & > tr > th,
+  & > thead > tr > th,
+  & > tbody > tr > th,
+  & > tfoot > tr > th,
+  & > tr > td,
+  & > thead > tr > td,
+  & > tbody > tr > td,
+  & > tfoot > tr > td {
+    padding: 8px;
+    border-right: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  & > tr > th,
+  & > thead > tr > th,
+  & > tbody > tr > th,
+  & > tfoot > tr > th {
+    font-weight: 600;
+    background-color: #fafafa;
+  }
+
+  & > tr:hover,
+  & > tbody > tr:hover,
+  & > tfoot > tr:hover {
+    background-color: #e6f7ff;
+  }
+
+  &.no-hover > tr:hover,
+  &.no-hover > tbody > tr:hover,
+  &.no-hover > tfoot > tr:hover {
+    background-color: transparent;
+  }
+
+  &.outline {
+    border-width: 0;
+    border-collapse: collapse;
+  }
+
+  &.outline > tr > th,
+  &.outline > thead > tr > th,
+  &.outline > tbody > tr > th,
+  &.outline > tfoot > tr > th,
+  &.outline > tr > td,
+  &.outline > thead > tr > td,
+  &.outline > tbody > tr > td,
+  &.outline > tfoot > tr > td {
+    outline: 1px solid #ccc;
+    border-width: 0;
+  }
+
+}
+
+.my-basic-table {
+  .jeecg-basic-form--compact {
+    .ant-form-item-label:not([class*=" ant-col-"]) {
+      width: auto;
+    }
+  }
+}
+
+.my-undefined {
+  /* color: red; */
+}
+
+.ant-table-column-title {
+  font-weight: 600;
+}
+
+.ant-tabs-tab {
+  font-weight: 600;
+}
+
+.title-center {
+  .ant-page-header-heading {
+    justify-content: center;
+  }
+}
+
+.ant-tag{
+  &.lg{
+    height: auto !important;
+    line-height: 1.6 !important;
+    font-size: 13px !important;
+  }
+  &.xl{
+    height: auto !important;
+    line-height: 1.9 !important;
+    font-size: 14px !important;
+  }
+}

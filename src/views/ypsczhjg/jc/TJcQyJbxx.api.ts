@@ -1,0 +1,78 @@
+import {defHttp} from '/@/utils/http/axios';
+import {Modal} from 'ant-design-vue';
+
+enum Api {
+  list = '/jc/qy/jbxx/list',
+  save='/jc/qy/jbxx/add',
+  edit='/jc/qy/jbxx/edit',
+  deleteOne = '/jc/qy/jbxx/delete',
+  deleteBatch = '/jc/qy/jbxx/deleteBatch',
+  importExcel = '/jc/qy/jbxx/importExcel',
+  exportXls = '/jc/qy/jbxx/exportXls',
+  queryJbxx='/jc/qy/jbxx/queryJbxx',
+  queryById='/jc/qy/jbxx/queryById',
+}
+/**
+ * 导出api
+ * @param params
+ */
+export const getExportUrl = Api.exportXls;
+/**
+ * 导入api
+ */
+export const getImportUrl = Api.importExcel;
+/**
+ * 列表接口
+ * @param params
+ */
+export const list = (params) =>
+  defHttp.get({url: Api.list, params});
+
+/**
+ * 删除单个
+ * @param params
+ * @param handleSuccess
+ */
+export const deleteOne = (params,handleSuccess) => {
+  return defHttp.delete({url: Api.deleteOne, params}, {joinParamsToUrl: true}).then(() => {
+    handleSuccess();
+  });
+}
+/**
+ * 批量删除
+ * @param params
+ * @param handleSuccess
+ */
+export const batchDelete = (params, handleSuccess) => {
+  Modal.confirm({
+    title: '确认删除',
+    content: '是否删除选中数据',
+    okText: '确认',
+    cancelText: '取消',
+    onOk: () => {
+      return defHttp.delete({url: Api.deleteBatch, data: params}, {joinParamsToUrl: true}).then(() => {
+        handleSuccess();
+      });
+    }
+  });
+}
+/**
+ * 保存或者更新
+ * @param params
+ * @param isUpdate 是否是更新数据
+ */
+export const saveOrUpdate = (params, isUpdate) => {
+  let url = isUpdate ? Api.edit : Api.save;
+  return defHttp.post({url: url, params});
+}
+
+
+//根据dmzj查对应的数据
+export const queryJbxx = (params) => {
+  return defHttp.get({url: Api.queryJbxx, params});
+}
+
+export const queryById = (params) => {
+ defHttp.get({url: Api.queryById, params});
+}
+

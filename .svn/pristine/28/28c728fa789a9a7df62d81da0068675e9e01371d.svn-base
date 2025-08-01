@@ -1,0 +1,27 @@
+<template>
+  <component :is="subComponent.component" :key="subComponent.name" />
+</template>
+<script lang="ts" name="dashboard-analysis" setup>
+import { computed, defineAsyncComponent } from 'vue';
+import { useGlobSetting } from '/@/hooks/setting';
+
+const globSetting = useGlobSetting();
+const subComponent = computed(() => {
+  if (globSetting.subSys == 'ypjy') {
+    return {
+      name: 'YpjyIndex',
+      component: defineAsyncComponent(() => import('./homePage/YpjyIndex.vue'))
+    }
+  } else if (globSetting.subSys == 'jcyp') {
+    return {
+      name: 'JcpzIndex',
+      component: defineAsyncComponent(() => import('/@/views/ypsczhjg/zdjg/jcpz/index.vue'))
+    }
+  } else {
+    return {
+      name: 'YpscIndex',
+      component: defineAsyncComponent(() => import('./homePage/YpscIndex.vue'))
+    }
+  }
+});
+</script>

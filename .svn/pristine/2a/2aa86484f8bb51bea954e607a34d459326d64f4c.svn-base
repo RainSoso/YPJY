@@ -1,0 +1,1104 @@
+<template>
+  <div class="homeBody">
+    <a-row :gutter="10">
+      <a-col :span="16">
+        <div class="gutter-head flex flex-col">
+          <div class="my-2  flex flex-row  items-center px-2 ">
+            <div class="qylx-title">
+              <SvgIcon size="18" name="ypjy-qylx-title" />企业类型
+            </div>
+          </div>
+          <div class="h-16/24 flex flex-row px-2">
+            <div class="w-24/24 mr-1 flex flex-col   ">
+              <div class="qylx-title inset-y-6 inset-x-4 relative z-1 cursor-pointer" @click="loadHomehead(hbGeo)">
+                返回
+              </div>
+              <div ref="mapChart" class="w-full h-full" />
+            </div>
+
+          </div>
+          <div class="h-2/24  flex flex-row justify-between  items-center px-2">
+            <div class="jcqk-title">年度检查情况</div>
+            <div>
+              <a-radio-group v-model:value="jcqk_lb" @change="homeSndqk()" buttonStyle="solid" size="small">
+                <a-radio-button value="11">药品批发</a-radio-button>
+                <a-radio-button value="18">连锁总部</a-radio-button>
+              </a-radio-group>
+              <a-radio-group v-model:value="jcqk_nd" @change="homeSndqk()" buttonStyle="solid" size="small"
+                style="margin-left: 10px;">
+                <a-radio-button :value="currentYear - 1">上一年</a-radio-button>
+                <a-radio-button :value="currentYear">本年</a-radio-button>
+              </a-radio-group>
+            </div>
+          </div>
+          <div class="h-4/24 flex flex-row justify-around px-2">
+            <div class="w-1/6 mr-1 p-4 flex flex-row relative" style="background-color: #EEFBEE;">
+              <div class="w-full flex flex-col justify-center cursor-pointer" @click="goxbwjc()">
+                <div class="jcqk-title-sl">年度</div>
+                <div class="jcqk-title-sl ">新办未检查</div>
+                <div class="jcqk-nd-sl mt-1" style="color: #49CF6B;">{{ count.xkbwjc }}</div>
+              </div>
+              <div class="absolute right-2 top-3">
+                <SvgIcon size="32" name="ypjy-nd-xkb" />
+              </div>
+            </div>
+            <div class="w-1/6 mx-1  p-4 flex flex-row relative" style="background-color: #FCF5EF;">
+              <div class="w-full flex flex-col justify-center cursor-pointer" @click="gowjcqy()">
+                <div class="jcqk-title-sl">年度</div>
+                <div class="jcqk-title-sl">未检查企业</div>
+                <div class="jcqk-nd-sl mt-1" style="color: #F69639;">{{ count.sndwjc }}</div>
+              </div>
+              <div class="absolute right-2  top-3">
+                <SvgIcon size="32" name="ypjy-nd-wjc" />
+              </div>
+            </div>
+            <div class="w-1/6 mx-1  p-4 flex flex-row relative" style="background-color: #FFF1F1;">
+              <div class="w-full flex flex-col justify-center cursor-pointer" @click="gojcbhg()">
+                <div class="jcqk-title-sl">年度</div>
+                <div class="jcqk-title-sl">检查不合格</div>
+                <div class="jcqk-nd-sl mt-1" style="color: #FF6663;">{{ count.jcbhg }}</div>
+              </div>
+              <div class="absolute right-2  top-3">
+                <SvgIcon size="32" name="ypjy-nd-jcbhg" />
+              </div>
+            </div>
+            <div class="w-1/6 mx-1  p-4 flex flex-row relative" style="background-color: #E9FBFE;">
+              <div class="w-full flex flex-col justify-center cursor-pointer" @click="gocybhg()">
+                <div class="jcqk-title-sl">年度</div>
+                <div class="jcqk-title-sl">抽检不合格</div>
+                <div class="jcqk-nd-sl mt-1" style="color: #28B6D7;">{{ count.cjbhg }}</div>
+              </div>
+              <div class="absolute right-2  top-3">
+                <SvgIcon size="32" name="ypjy-nd-cjbhg" />
+              </div>
+            </div>
+            <div class="w-1/6 mx-1  p-4 flex flex-row relative" style="background-color: #FCF5EF;">
+              <div class="w-full flex flex-col justify-center cursor-pointer" @click="gondzfcf()">
+                <div class="jcqk-title-sl">年度</div>
+                <div class="jcqk-title-sl">被处罚企业</div>
+                <div class="jcqk-nd-sl mt-1" style="color: #F69639;">{{ count.ndzfcf }}</div>
+              </div>
+              <div class="absolute right-2  top-3">
+                <SvgIcon size="32" name="ypjy-nd-cf" />
+              </div>
+            </div>
+            <div class="w-1/6 ml-1  p-4 flex flex-row relative" style="background-color: #F3F8FE;">
+              <div class="w-full flex flex-col justify-center">
+                <div class="jcqk-title-sl">未进行</div>
+                <div class="jcqk-title-sl">药品追溯</div>
+                <div class="jcqk-nd-sl mt-1" style="color: #5897F4;">0</div>
+              </div>
+              <div class="absolute right-2  top-3">
+                <SvgIcon size="32" name="ypjy-nd-wzs" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </a-col>
+      <a-col :span="8" v-show="true">
+        <div class="w-24/24 h-24/24 ml-1 flex flex-col">
+          <div class="h-1/24  flex flex-row  items-center my-2">
+            <div class="jcqk-title">检查情况({{ xzqhdmName }})/(单位：次)</div>
+          </div>
+
+          <div class="h-7/24  mt-2 flex flex-row">
+            <div class="jcqk-border w-1/2   mr-1 flex flex-row  " style=" background: #FCFDFF;">
+              <div class="w-8/24 h-full  flex flex-col justify-center items-center jcqk-qylx-bg">
+                <div>
+                  <SvgIcon size="24" name="ypjy-yppf" />
+                </div>
+                <div class="jcqk-content-sm"> 药品批发</div>
+              </div>
+              <div class="w-16/24 flex flex-col justify-around p-3">
+                <div class="flex flex-row justify-between">
+                  <div class="jcqk-name">已检查</div>
+                  <div class="jcqk-content-md  cursor-pointer" @click="gopfyjc()">
+                    <!-- <CountTo :startVal="0" :endVal="homeZxcjh.pfyjc" /> -->
+                    {{ count.ndpfyjc }}
+                  </div>
+                </div>
+                <div class="flex flex-row justify-between">
+                  <div class="jcqk-name">需检查</div>
+                  <div class="jcqk-content-md cursor-pointer" @click="gopfxjc()">{{ count.ndpfxjc }}</div>
+                </div>
+                <div class="flex flex-row justify-between ">
+                  <div class="jcqk-name">已填年报</div>
+                  <div class="jcqk-content-md">0</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="jcqk-border w-1/2 ml-1 flex flex-row " style=" background: #FCFDFF;">
+              <div class="w-8/24 h-full  flex flex-col justify-center items-center jcqk-qylx-bg">
+                <div>
+                  <SvgIcon size="24" name="ypjy-lszb" />
+                </div>
+                <div class="jcqk-content-sm"> 连锁总部</div>
+              </div>
+              <div class="w-16/24 flex flex-col justify-around p-3 ">
+                <div class="flex flex-row justify-between">
+                  <div class="jcqk-name">已检查</div>
+                  <div class="jcqk-content-md cursor-pointer" @click="gozbyjc()">{{ count.ndzbyjc }}</div>
+                </div>
+                <div class="flex flex-row justify-between">
+                  <div class="jcqk-name">需检查</div>
+                  <div class="jcqk-content-md cursor-pointer" @click="gozbxjc()">{{ count.ndzbxjc }}</div>
+                </div>
+                <div class="flex flex-row justify-between">
+                  <div class="jcqk-name">已填年报</div>
+                  <div class="jcqk-content-md">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="h-6/24  mt-2 flex flex-row" style=" background: #FCFDFF;">
+            <div class="jcqk-border w-1/2   mr-1 flex flex-row  ">
+              <div class="w-8/24 h-full  flex flex-col justify-center items-center jcqk-qylx-bg">
+                <div>
+                  <SvgIcon size="24" name="ypjy-jcqk-zxjc" />
+                </div>
+                <div class="jcqk-content-sm"> 专项检查 </div>
+              </div>
+              <div class="w-16/24 flex flex-col justify-around p-3">
+                <div class="flex flex-row justify-between ">
+                  <div class="jcqk-name">已检查</div>
+                  <div class="jcqk-content-md cursor-pointer" @click="gozxyjc()">{{ count.zxyjc }}</div>
+                </div>
+                <div class="flex flex-row justify-between">
+                  <div class="jcqk-name">需检查</div>
+                  <div class="jcqk-content-md cursor-pointer" @click="gozxxjc()">{{ count.zxxjc }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="jcqk-border w-1/2 ml-1 flex flex-row ">
+              <div class="w-8/24 h-full  flex flex-col justify-center items-center jcqk-qylx-bg">
+                <div>
+                  <SvgIcon size="24" name="ypjy-jcqk-qtjc" />
+                </div>
+                <div class="jcqk-content-sm"> 其他检查 </div>
+              </div>
+              <div class="w-16/24 flex flex-col justify-around p-3 ">
+                <div class="flex flex-row justify-between">
+                  <div class="jcqk-name">执法处罚</div>
+                  <div class="jcqk-content-md cursor-pointer" @click="gozfcfTj()">{{ count.zfcf }}</div>
+                </div>
+                <div class="flex flex-row justify-between">
+                  <div class="jcqk-name">抽检验</div>
+                  <div class="jcqk-content-md cursor-pointer" @click="gocjyBhg()">{{ count.cjy }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="h-1/24  flex flex-row  items-center my-2">
+            <div class="jcqk-title">企业数量</div>
+          </div>
+          <div class="h-9/24 jcqk-border flex flex-col justify-around" style=" background: #FCFDFF;">
+            <div class="flex flex-row justify-around">
+              <div class="flex flex-row items-center cursor-pointer" @click="gopfqy()">
+                <div class="flex flex-col items-center ml-2">
+                  <a-progress type="dashboard" :percent="85" :width="55" strokeColor="#FF959A" :strokeWidth="8">
+                    <template #format="percent">
+                      <span class="jcqk-title">
+                        {{ count.pfzs }}
+                      </span>
+                    </template>
+                  </a-progress>
+                  <div class="jcqk-title-sl">药品批发</div>
+                </div>
+              </div>
+              <div class="flex flex-row items-center cursor-pointer" @click="gozbqy()">
+                <div class="flex flex-col items-center ml-2">
+                  <a-progress type="dashboard" :percent="76" :width="55" strokeColor="#95E19D" :strokeWidth="8">
+                    <template #format="percent">
+                      <span class="jcqk-title"> {{ count.lszb }}</span>
+                    </template>
+                  </a-progress>
+                  <div class="jcqk-title-sl">连锁总部</div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-row justify-around">
+              <div class="flex flex-row items-center cursor-pointer" @click="golsmd()">
+                <div class="flex flex-col items-center ml-2">
+                  <a-progress type="dashboard" :percent="86" :width="55" strokeColor="#54D7F5" :strokeWidth="8">
+                    <template #format="percent">
+                      <span class="jcqk-title"> {{ count.lsmd }} </span>
+                    </template>
+                  </a-progress>
+                  <div class="jcqk-title-sl">零售连锁</div>
+                </div>
+              </div>
+              <div class="flex flex-row items-center cursor-pointer" @click="golsdt()">
+                <div class="flex flex-col items-center ml-2">
+                  <a-progress type="dashboard" :percent="86" :width="55" strokeColor="#FFB675" :strokeWidth="8">
+                    <template #format="percent">
+                      <span class="jcqk-title"> {{ count.ls }} </span>
+                    </template>
+                  </a-progress>
+                  <div class="jcqk-title-sl">零售单体</div>
+                </div>
+              </div>
+              <div class="flex flex-row items-center cursor-pointer" @click="gosfpt()">
+                <div class="flex flex-col items-center ml-2">
+                  <a-progress type="dashboard" :percent="15" :width="55" strokeColor="#8CB4FA" :strokeWidth="8">
+                    <template #format="percent">
+                      <span class="jcqk-title"> {{ count.sfpt }} </span>
+                    </template>
+                  </a-progress>
+                  <div class="jcqk-title-sl" title="药品网络交易第三方平台备案">三方平台</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a-col>
+    </a-row>
+    <a-row :gutter="10" style="margin-top: 10px;">
+      <a-col :span="8">
+        <div class="gutter-bottom flex flex-col  p-3">
+          <div class="flex flex-row justify-between items-center ">
+            <div class="qylx-title">
+              <SvgIcon size="18" name="ypjy-qylx-title" />违法行为数量分布情况
+            </div>
+          </div>
+          <div ref="xkChart" class="mr-1 m-full h-full"></div>
+        </div>
+      </a-col>
+      <a-col :span="8">
+        <div class="gutter-bottom flex flex-col  p-2">
+          <div class="flex flex-row justify-between items-center ">
+            <div class="qylx-title">
+              <SvgIcon size="18" name="ypjy-qylx-title" />企业类型
+            </div>
+            <div class="flex flex-row">
+              <div>
+                <a-select :bordered="false" v-model:value="qylxSelect" @change="homeQylx()" style="width: 100px">
+                  <a-select-option value="11">药品批发</a-select-option>
+                  <a-select-option value="18">连锁总部</a-select-option>
+                </a-select>
+              </div>
+              <div>
+                <a-select :bordered="false" v-model:value="qylxNdSelect" @change="homeQylx()" style="width: 90px">
+                  <a-select-option value="2024">2024年</a-select-option>
+                  <a-select-option value="2023">2023年</a-select-option>
+                </a-select>
+              </div>
+            </div>
+          </div>
+          <div ref="qylxChart" class="mr-1 m-full h-full"></div>
+        </div>
+      </a-col>
+      <a-col :span="8">
+        <div class="gutter-bottom flex flex-col  p-3">
+          <div class="flex flex-row justify-between items-center ">
+            <div class="qylx-title">
+              <SvgIcon size="18" name="ypjy-qylx-title" />检查情况
+            </div>
+            <div>
+              <a-radio-group v-model:value="jnqk_lb" @change="homeJcqk()" buttonStyle="solid" size="small">
+                <a-radio-button value="11">药品批发</a-radio-button>
+                <a-radio-button value="18">连锁总部</a-radio-button>
+              </a-radio-group>
+            </div>
+          </div>
+          <div ref="jcqkChart" class="mr-1 m-full h-full"></div>
+        </div>
+      </a-col>
+    </a-row>
+  </div>
+
+</template>
+<script setup lang="ts">
+import { ref, computed, Ref, reactive, onMounted } from 'vue';
+import { SvgIcon } from '/@/components/Icon';
+import { useECharts } from '/@/hooks/web/useECharts';
+import { registerMap } from 'echarts';
+import hbGeo from '/@/utils/map/420000.json';
+import hbFullGeo from '/@/utils/map/420000_full.json'
+import mapDataBorder from '/@/utils/map/420000_border.json';
+import { useGo } from '/@/hooks/web/usePage';
+import { useLoading } from '/@/components/Loading';
+import { defHttp } from '/@/utils/http/axios';
+import Tools from '/@/utils/tools';
+import { CountTo } from '/@/components/CountTo/index';
+import { formatToDate } from '/@/utils/dateUtil';
+import { debug } from 'console';
+import { reduce } from 'lodash-es';
+const formatToDate1 = formatToDate;
+const go = useGo();
+const jcqk_lb = ref('11');
+const currentYear = ref(Tools.getCurrentYear());
+//默认获取上一年份
+const jcqk_nd = ref(currentYear.value - 1)
+const bhgxm_lb = ref('11');
+const xxzx_lb = ref('1');
+const qylxSelect = ref('11');
+const jnqk_lb = ref('11');
+const qylxNdSelect = ref(Tools.getCurrentYear());
+const xzqhdm = ref('');
+const xzqhdmName = ref('湖北省');
+const homeHeadData = ref({});
+const homeZxcjh = ref({});
+const homeNdcjh = ref({});
+const qyCo = ref({});
+const sndqkData = ref({});
+const tzggData = ref([]);
+const xkxxData = ref([]);
+const qylxData = ref([])
+const xzqhdmData = ref([])
+const bhgxmData = ref([]);
+const layoutSize = ref('185%');
+
+//数字动画qyCo.pfzs
+const stepId = ref('');
+const duration = 2000; // 动画持续时间，单位为毫秒
+const count = ref({
+  'zfcf': 0, 'cjy': 0, 'pfzs': 0, 'lszb': 0, 'lsmd': 0, 'ls': 0, 'sfpt': 0
+  , 'ndpfyjc': 0, 'ndpfxjc': 0, 'ndzbyjc': 0, 'ndzbxjc': 0, 'zxyjc': 0, 'zxxjc': 0
+  , 'xkbwjc': 0, 'sndwjc': 0, 'jcbhg': 0, 'cjbhg': 0, 'ndzfcf': 0
+}); // 获取数字显示的元素
+const startTime = ref(null); // 动画开始时间
+function step(timestamp) {
+  if (!startTime.value) startTime.value = timestamp; // 记录动画开始时间
+  const progress = timestamp - startTime.value; // 计算动画进度
+  // 根据动画进度计算当前数字的值
+  const currentNumberZfcf = Math.round(qyCo.value.zfcf * (progress / duration));
+  const currentNumberCjy = Math.round(qyCo.value.cjy * (progress / duration));
+  const currentNumberPfzs = Math.round(qyCo.value.pfzs * (progress / duration));
+  const currentNumberLszb = Math.round(qyCo.value.lszb * (progress / duration));
+  const currentNumberLsmd = Math.round(qyCo.value.lsmd * (progress / duration));
+  const currentNumberLs = Math.round(qyCo.value.ls * (progress / duration));
+  const currentNumberSfpt = Math.round(qyCo.value.sfpt * (progress / duration));
+
+  const currentNumberNdpfyjc = Math.round(homeNdcjh.value.pfyjc * (progress / duration));
+  const currentNumberNdpfxjc = Math.round(homeNdcjh.value.pfxjc * (progress / duration));
+  const currentNumberNdzbyjc = Math.round(homeNdcjh.value.zbyjc * (progress / duration));
+  const currentNumberNdzbxjc = Math.round(homeNdcjh.value.zbxjc * (progress / duration));
+
+  const currentNumberZxyjc = Math.round((homeZxcjh.value.zbyjc + homeZxcjh.value.pfyjc) * (progress / duration));
+  const currentNumberZxxjc = Math.round((homeZxcjh.value.zbxjc + homeZxcjh.value.pfxjc) * (progress / duration));
+
+  const currentNumberXkbwjc = Math.round(sndqkData.value.xkbwjc * (progress / duration));
+  const currentNumberSndwjc = Math.round(sndqkData.value.sndwjc * (progress / duration));
+  const currentNumberJcbhg = Math.round(sndqkData.value.jcbhg * (progress / duration));
+  const currentNumberCjbhg = Math.round(sndqkData.value.cjbhg * (progress / duration));
+  const currentNumberNdzfcf = Math.round(sndqkData.value.ndzfcf * (progress / duration));
+
+  count.value.pfzs = currentNumberPfzs; // 更新数字显示
+  count.value.lszb = currentNumberLszb;
+  count.value.lsmd = currentNumberLsmd;
+  count.value.ls = currentNumberLs;
+  count.value.sfpt = currentNumberSfpt;
+  count.value.zfcf = currentNumberZfcf;
+  count.value.cjy = currentNumberCjy;
+
+  count.value.ndpfyjc = currentNumberNdpfyjc;
+  count.value.ndpfxjc = currentNumberNdpfxjc;
+  count.value.ndzbyjc = currentNumberNdzbyjc;
+  count.value.ndzbxjc = currentNumberNdzbxjc;
+
+  count.value.zxyjc = currentNumberZxyjc;
+  count.value.zxxjc = currentNumberZxxjc;
+
+  count.value.xkbwjc = currentNumberXkbwjc;
+  count.value.sndwjc = currentNumberSndwjc;
+  count.value.jcbhg = currentNumberJcbhg;
+  count.value.cjbhg = currentNumberCjbhg;
+  count.value.ndzfcf = currentNumberNdzfcf;
+  if (progress < duration) {
+    // 继续下一帧动画
+    stepId.value = requestAnimationFrame(step);
+  } else {
+    // 动画结束，显示最终数字
+    count.value.pfzs = qyCo.value.pfzs;
+    count.value.lszb = qyCo.value.lszb;
+    count.value.lsmd = qyCo.value.lsmd;
+    count.value.ls = qyCo.value.ls;
+    count.value.sfpt = qyCo.value.sfpt;
+    count.value.zfcf = qyCo.value.zfcf;
+    count.value.cjy = qyCo.value.cjy;
+
+    count.value.ndpfyjc = homeNdcjh.value.pfyjc;
+    count.value.ndpfxjc = homeNdcjh.value.pfxjc;
+    count.value.ndzbyjc = homeNdcjh.value.zbyjc;
+    count.value.ndzbxjc = homeNdcjh.value.zbxjc;
+
+    count.value.zxyjc = homeZxcjh.value.zbyjc + homeZxcjh.value.pfyjc
+    count.value.zxxjc = homeZxcjh.value.zbxjc + homeZxcjh.value.pfxjc;
+
+    count.value.xkbwjc = sndqkData.value.xkbwjc;
+    count.value.sndwjc = sndqkData.value.sndwjc;
+    count.value.jcbhg = sndqkData.value.jcbhg;
+    count.value.cjbhg = sndqkData.value.cjbhg;
+    count.value.ndzfcf = sndqkData.value.ndzfcf;
+    cancelAnimationFrame(stepId.value);
+  }
+}
+
+const mapOption = reactive({
+  tooltip: {
+    trigger: 'item',
+    formatter: function (item) {
+      let val = item.data;
+      let array = []
+      if (val) {
+        array.push('<b>', item.name, '</b><br/><table>');
+        array.push('<tr><td class="pr-2">  企业总数 </td><td class="text-left">', val.qyzs, '</td></tr>');
+        array.push('<tr><td class="pr-2">  批发企业数 </td><td class="text-left">', val.pfzs, '</td></tr>');
+        array.push('<tr><td class="pr-2">  连锁总部企业数 </td><td class="text-left">', val.lszb, '</td></tr>');
+        array.push('<tr><td class="pr-2">  监督检查数 </td><td class="text-left">', val.jdjc, '</td></tr>');
+        array.push('<tr><td class="pr-2">  执法处罚数 </td><td class="text-left">', val.zfcf, '</td></tr>');
+        array.push('<tr><td class="pr-2">  抽检数 </td><td class="text-left">', val.cjy, '</td></tr>');
+        array.push('</table>');
+      }
+      return array.join('');
+    }
+  },
+  toolbox: {
+    show: true,
+  },
+  visualMap: {
+    pieces: [                           //自定义『分段式视觉映射组件（visualMapPiecewise）』的每一段的范围，以及每一段的文字，以及每一段的特别的样式
+      { min: 500 },                     // 不指定 max，表示 max 为无限大（Infinity）。
+      { min: 50, max: 500 },
+      { min: 10, max: 50, },
+      { max: 10 }
+    ],
+    splitNumber: 4,
+    zlevel: 0,
+    z: 2,
+    align: 'left',
+    right: 10,
+    top: 10,
+    color: ['#4E84FE', '#4E84FE', '#81A7FE', '#B3CAFE'],
+    textStyle: {
+      color: '#172135'
+    }
+  }, geo: [{
+    map: 'HB', aspectScale: 1, zoom: 1.2, animationDurationUpdate: 0, layoutCenter: ['50%', '49%'], layoutSize: '130%', roam: false, silent: true, emphasis: { label: { show: false } }
+    , itemStyle: { borderWidth: 0, borderColor: 'transparent', shadowColor: '#8cd3ef', shadowOffsetY: 10, shadowBlur: 120, areaColor: 'transparent' }
+  }, {
+    map: 'HB', zlevel: -1, aspectScale: 1, zoom: 1.2, animationDurationUpdate: 0, layoutCenter: ['50%', '50%'], layoutSize: '130%', roam: false, silent: true
+    , itemStyle: { borderWidth: 0, borderColor: 'rgba(58,149,253,0.8)', shadowColor: 'rgba(172, 122, 255,0.5)', shadowOffsetY: 5, shadowBlur: 15, areaColor: 'rgba(5,21,35,0.1)' }
+  }, {
+    map: 'HB', zlevel: -2, aspectScale: 1, zoom: 1.2, animationDurationUpdate: 0, layoutCenter: ['50%', '51%'], layoutSize: '130%', roam: false, silent: true
+    , itemStyle: { borderWidth: 0, borderColor: 'rgba(58,149,253,0.6)', shadowColor: 'rgba(65, 214, 255,1)', shadowOffsetY: 5, shadowBlur: 15, areaColor: 'transpercent' }
+  }, {
+    map: 'HB', zlevel: -3, aspectScale: 1, zoom: 1.2, animationDurationUpdate: 0, layoutCenter: ['50%', '52%'], layoutSize: '130%', roam: false, silent: true
+    , itemStyle: { borderWidth: 0, borderColor: 'rgba(58,149,253,0.4)', shadowColor: 'rgba(58,149,253,1)', shadowOffsetY: 15, shadowBlur: 10, areaColor: 'transpercent' }
+  }, {
+    map: 'HB', zlevel: -4, aspectScale: 1, zoom: 1.2, animationDurationUpdate: 0, layoutCenter: ['50%', '53%'], layoutSize: '130%', roam: false, silent: true
+    , itemStyle: { borderWidth: 5, borderColor: 'rgba(5,9,57,0.8)', shadowColor: 'rgba(29, 111, 165,0.8)', shadowOffsetY: 15, shadowBlur: 10, areaColor: 'rgba(5,21,35,0.1)' }
+  }]
+  ,
+  series: [
+    {
+      name: '湖北省企业',
+      type: 'map',
+      map: 'HB',
+      label: {
+        show: true,
+        formatter: '{b}',
+        color: '#fff',
+        fontSize: '130%'
+      },
+      itemStyle: {
+        areaColor: 'transparent', borderType: [1, 2], borderWidth: 1, borderColor: '#fff'
+      }, emphasis: {
+        itemStyle: { show: false, color: '#fff', areaColor: 'rgba(255,215,0,1)', shadowColor: 'rgba(29, 111, 165,0.8)', shadowOffsetY: 6, shadowBlur: 10 }
+      }, select: {
+        itemStyle: { show: false, color: '#fff', areaColor: 'rgba(255,215,0,1)', shadowColor: 'rgba(29, 111, 165,0.8)', shadowOffsetY: 6, shadowBlur: 10 }
+      },
+      aspectScale: 1,
+      zoom: 1.2,
+      roam: true,
+      layoutCenter: ['50%', '49%'],
+      //layoutCenter: ['30%', '20%'],
+      layoutSize: '130%',
+      animationDurationUpdate: 0,
+      data: [],
+      nameMap: {
+        '恩施土家族苗族自治州': '恩施州'
+      }
+    }
+  ]
+});
+const mapChart = ref<HTMLDivElement | null>(null);
+const xkChart = ref<HTMLDivElement | null>(null);
+const qylxChart = ref<HTMLDivElement | null>(null);
+const jcqkChart = ref<HTMLDivElement | null>(null);
+const { setOptions: setOptionsMapChart, resize: mapResize } = useECharts(mapChart as Ref<HTMLDivElement>);
+const { setOptions: setOptionsxkChart, resize: xkResize } = useECharts(xkChart as Ref<HTMLDivElement>);
+const { setOptions: setOptionsqylxChart } = useECharts(qylxChart as Ref<HTMLDivElement>);
+const { setOptions: setOptionsjcqkChart } = useECharts(jcqkChart as Ref<HTMLDivElement>);
+
+function loadHomehead(geo, params = {}, isFirst = true, isDown = true) {
+
+  defHttp.get({ url: '/report/ypjyHomePage/homeHead', params: { year: currentYear.value, zslx: jcqk_lb.value, ...params } }).then((res) => {
+    homeZxcjh.value = res.homeZxcjh;
+    homeNdcjh.value = res.homeNdcjh;
+    qyCo.value = res.qyCo;
+    stepId.value = requestAnimationFrame(step);
+    startTime.value = null;
+    let xzqh = res.xzqh;
+    xzqhdm.value = res.xzqh;//赋值初始行政区划代码
+    if (xzqh == '42') {
+      xzqhdmName.value = '湖北省';
+    } else if (xzqh == '420500,429021') {
+      xzqhdmName.value = '宜昌分局';
+    } else if (xzqh == '429004,429005,429006') {
+      xzqhdmName.value = '汉江分局';
+    } else if (xzqh.length == '4') {
+      if (res.xzqhName.indexOf('分局') > -1) {
+        xzqhdmName.value = res.xzqhName;
+      }
+    }
+    homeSndqk({ areaCode: res.xzqh });
+    res.mapData.forEach(item => {
+      item.value = item.qyzs;
+    })
+    if (isFirst) {
+      xzqhdmData.value.push({ name: res.xzqhName, value: xzqh });
+      if (xzqh == '42') {
+        //省局
+        layoutSize.value = '185%';
+        //mapOption.series[0].layoutSize = layoutSize.value;
+        registerMap('HB', geo);
+      } else {
+        let temp = JSON.parse(JSON.stringify(hbFullGeo));
+        temp.features = temp.features.filter(item => {
+          if (xzqh.length < 6) {
+            xzqh = xzqh.padEnd(6, '0')
+          }
+          let flag = xzqh.split(',').filter(qh => {
+            qh = qh.padEnd(6, '0');
+            if (qh.includes('4205') || qh.includes('4290')) {
+              //宜昌 汉江分局
+              return qh.includes(item.properties.adcode);
+            } else {
+              return qh.includes(item.properties.parent.adcode);
+            }
+          })
+          return flag.length > 0;
+        })
+        registerMap('HB', temp);
+      }
+      registerMap('湖北省边框', mapDataBorder);
+    }
+    if (isDown) {
+      mapOption.series[0].data = res.mapData;
+    }
+    setOptionsMapChart(mapOption, true, (res) => {
+      if (!isFirst) return;
+      res.on('click', (res) => {
+
+        layoutSize.value = '130%';
+        // mapOption.series[0].layoutSize = layoutSize.value;
+        Tools.throttle(() => {
+          debugger;
+          if (res.data == null) {
+            if (res.name === '武汉经济技术开发区') {
+              xzqhdm.value = '420122';
+              xzqhdmName.value = '武汉经济技术开发区';
+            } else if (res.name === '武汉东湖新技术开发区') {
+              xzqhdm.value = '420118';
+              xzqhdmName.value = '武汉东湖新技术开发区';
+            }
+          } else {
+            xzqhdm.value = res.data.xzqhdm;
+            xzqhdmName.value = res.data.name;
+          }
+          let activeItem = geo.features.find(item => item.properties.adcode == xzqhdm.value);
+          if (activeItem && activeItem.properties.adcode && activeItem.properties.childrenNum) {
+            //判断是否可以下钻
+            let temp = JSON.parse(JSON.stringify(hbFullGeo));
+            temp.features = temp.features.filter(item => item.properties.parent.adcode == xzqhdm.value);
+            registerMap('HB', temp);
+            loadHomehead(hbFullGeo, { areaCode: xzqhdm.value }, false, true);
+          } else {
+            loadHomehead(hbFullGeo, { areaCode: xzqhdm.value }, false, false);
+          }
+          homeSndqk({ areaCode: xzqhdm.value });
+        });
+
+      });
+      res.on('georoam', (params) => {
+        let option = res.getOption();//获得option对象
+        let len = option.geo.length;
+        if (params.zoom != null) { //捕捉到缩放时
+          for (var i = 0; i < len; i++) {
+            option.geo[i].center = option.series[0].center;
+            option.geo[i].zoom = option.series[0].zoom;
+          }
+        } else {//捕捉到拖曳时
+          for (var i = 0; i < len; i++) {
+            option.geo[i].center = option.series[0].center;
+          }
+        }
+        res.setOption(option);//设置option
+      })
+    });
+  })
+}
+function homeBhgxm() {
+  defHttp.get({ url: '/report/ypjyHomePage/homeBhgxm', params: { year: currentYear.value, zslx: bhgxm_lb.value } }).then((res) => {
+    bhgxmData.value = res;
+  })
+}
+function homeSndqk(params = { areaCode: xzqhdm.value }) {
+  defHttp.get({ url: '/report/ypjyHomePage/homeSndqk', params: { year: jcqk_nd.value, zslx: jcqk_lb.value, ...params } }).then((res) => {
+    sndqkData.value = res;
+    stepId.value = requestAnimationFrame(step);
+    //startTime.value = null;
+
+  })
+}
+function homeFlfg() {
+  defHttp.get({ url: '/report/ypjyHomePage/homeFlfg', params: {} }).then((res) => {
+    tzggData.value = res;
+  })
+}
+function homeTzgg() {
+  defHttp.get({ url: '/report/ypjyHomePage/homeTzgg', params: {} }).then((res) => {
+    tzggData.value = res;
+  })
+}
+function homeXxzx() {
+  if (xxzx_lb.value == '1') {
+    homeTzgg();
+  } else {
+    homeFlfg();
+  }
+}
+function homeXkxx() {
+  defHttp.get({ url: '/report/ypjyHomePage/jczfIndex', params: {} }).then((res) => {
+    setOptionsxkChart({
+      tooltip: { trigger: 'item' },
+      series: [{
+        name: '案件地市分布情况', type: 'pie', radius: '60%', center: ['50%', '50%'], startAngle: 205,
+        label: { formatter: '{b} {c} 例' },
+        data: (res.fbqk || []).filter((item) => {
+          return item.code
+        }),
+        animationType: 'scale', animationEasing: 'exponentialInOut', animationDelay: function () {
+          return Math.random() * 400;
+        }
+      }]
+    }, true, (res) => {
+      res.on('click', function (params) {
+        go({ path: '/jgyw/jyjczf', query: { tj: 'Y', xzqhdm: params.data.code } });
+
+      });
+    })
+  })
+}
+function homeQylx() {
+  defHttp.get({ url: '/report/ypjyHomePage/homeQylx', params: { year: qylxNdSelect.value, zslx: qylxSelect.value } }).then((res) => {
+    setOptionsqylxChart({
+      title: {
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: function (val) {
+          return val.name + val.value + '家';
+        }
+      },
+      legend: {
+        orient: 'vertical',
+        left: 'right',
+        align: 'left',
+        top: 'middle',
+        itemGap: 15,
+        textStyle: {
+          fontfamily: 'Source Han Sans CN',
+          fontsize: '18px',
+          fontweight: '400',
+          lineheight: '24px',
+          textalign: 'left',
+          color: '#000000',
+        },
+        formatter: function (name) {
+          var tarValue;
+          let data = res;
+          for (var i = 0; i < data.length; i++) {
+            if (data[i].name == name) {
+              tarValue = data[i].value;
+              break;
+            }
+          }
+          return name + tarValue + '家';
+        }
+      },
+
+      series: [
+        {
+          name: 'Access From',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          center: ["30%", "50%"],
+          avoidLabelOverlap: false,
+          label: {
+            show: false,
+            position: 'center'
+          },
+          labelLine: {
+            show: false
+          },
+          data: res,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          }
+        }
+      ]
+    }, true, (res) => {
+      res.on('click', function (params) {
+        var par = { 'yppzmc': params.name, 'year': qylxNdSelect.value, 'zslx': qylxSelect.value };
+        if (qylxSelect.value == '11') {
+          go({ path: '/yqyd/11', query: par });
+        } else {
+          go({ path: '/yqyd/18', query: par });
+        }
+      });
+    })
+  })
+}
+
+function homeJcqk() {
+  defHttp.get({ url: '/report/ypjyHomePage/homeJcqk', params: { zslx: jnqk_lb.value } }).then((res) => {
+    setOptionsjcqkChart({
+
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        data: ['检查', '不合格'],
+        x: 'right',
+        top: 20,
+        itemWidth: 15,
+        itemHeight: 15,
+        icon: 'circle',
+        textStyle: {
+          //styleName: 14R;
+          fontfamily: 'Source Han Sans CN',
+          fontsize: '14px',
+          fontweight: '400',
+          lineheight: '22px',
+          textalign: 'left',
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: res.yf,
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          name: '检查',
+          type: 'line',
+          stack: 'Total',
+          data: res.zs,
+        },
+        {
+          name: '不合格',
+          type: 'line',
+          stack: 'Total',
+          data: res.bhg,
+        }
+      ]
+    })
+  })
+}
+
+//药品批发 已检查 跳转
+function gopfyjc() {
+  if (homeNdcjh.value.pfyjc != 0) {
+    go({ path: `/ypjy/rcjg/RcjgjbxxListHome/11/` + currentYear.value + '/' + xzqhdm.value + '/yjc/1' });
+  }
+  // go({ path: '/yqyd/11', query: { year: currentYear.value,xzqh: xzqhdm.value,type: 'yjc' } });
+
+}
+//药品批发 需检查 跳转
+function gopfxjc() {
+  if (homeNdcjh.value.pfxjc != 0) {
+    go({ path: `/ypjy/rcjg/RcjgjbxxListHome/11/` + currentYear.value + '/' + xzqhdm.value + '/xjc/1' });
+  }
+}
+//总部 已检查 跳转
+function gozbyjc() {
+  if (homeNdcjh.value.zbyjc != 0) {
+    go({ path: `/ypjy/rcjg/RcjgjbxxListHome/18/` + currentYear.value + '/' + xzqhdm.value + '/yjc/1' });
+  }
+}
+//总部 需检查 跳转
+function gozbxjc() {
+  if (homeNdcjh.value.zbxjc != 0) {
+    go({ path: `/ypjy/rcjg/RcjgjbxxListHome/18/` + currentYear.value + '/' + xzqhdm.value + '/xjc/1' });
+  }
+}
+
+//专项检查跳转  已检查
+function gozxyjc() {
+  if ((homeZxcjh.value.zbyjc + homeZxcjh.value.pfyjc) != 0) {
+    go({ path: `/ypjy/rcjg/RcjgjbxxListHome/18/` + currentYear.value + '/' + xzqhdm.value + '/yjc/2' });
+  }
+}
+
+function gozxxjc() {
+  if ((homeZxcjh.value.zbxjc + homeZxcjh.value.pfxjc) != 0) {
+    go({ path: `/ypjy/rcjg/RcjgjbxxListHome/18/` + currentYear.value + '/' + xzqhdm.value + '/xjc/2' });
+  }
+}
+// 抽检不合格
+function gocjyBhg() {
+  if (qyCo.value.cjy != 0) {
+    go({ path: `/ypjy/homePage/cjybhg/cjy/` + currentYear.value + '/' + xzqhdm.value });
+  }
+}
+//执法处罚
+function gozfcfTj() {
+  if (qyCo.value.zfcf != 0) {
+    go({ path: `/ypjy/homePage/zfcf/zfcf/` + currentYear.value + '/' + xzqhdm.value });
+  }
+}
+
+//批发企业
+function gopfqy() {
+  go({ path: `/ypjy/homePage/yppf/yppf/` + currentYear.value + '/' + xzqhdm.value });
+}
+//连锁总部企业
+function gozbqy() {
+  go({ path: `/ypjy/homePage/lszb/lszb/` + currentYear.value + '/' + xzqhdm.value });
+}
+// function goypcjy() {
+//   go({ path: '/jgyw/ypcj', query: { year: currentYear.value } });
+// }
+// function gozfcf() {
+//   go({ path: '/jgyw/jczf', query: { year: currentYear.value } });
+// }
+function gosfpt() {
+  go({ path: `/ypjy/dsfpt/` + xzqhdm.value });
+}
+function golsdt() {
+  go({ path: `/ypjy/dtls/1/` + xzqhdm.value });
+}
+function golsmd() {
+  go({ path: `/ypjy/dtls/2/` + xzqhdm.value });
+
+}
+
+//新版未检查  批发/总部跳转
+function goxbwjc() {
+  if (sndqkData.value.xkbwjc != 0) {
+    go({ path: `/ypjy/homePage/xbwjc/` + jcqk_lb.value + '/' + jcqk_nd.value + '/' + xzqhdm.value + '/xbwjc' });
+  }
+}
+
+function gowjcqy() {
+  if (sndqkData.value.sndwjc != 0) {
+    go({ path: `/ypjy/homePage/wjcqy/` + jcqk_lb.value + '/' + jcqk_nd.value + '/' + xzqhdm.value + '/wjcqy' });
+  }
+}
+
+//监管不合格
+function gojcbhg() {
+  if (sndqkData.value.jcbhg != 0) {
+    go({ path: `/ypjy/homePage/jcbhg/` + jcqk_lb.value + '/' + jcqk_nd.value + '/' + xzqhdm.value + '/jcbhg' });
+  }
+}
+//抽样不合格
+function gocybhg() {
+  if (sndqkData.value.cjbhg != 0) {
+    go({ path: `/ypjy/homePage/cybhg/` + jcqk_lb.value + '/' + jcqk_nd.value + '/' + xzqhdm.value + '/cybhg' });
+  }
+}
+
+//上一年度执法处罚企业
+function gondzfcf() {
+  if (sndqkData.value.ndzfcf != 0) {
+    go({ path: `/ypjy/homePage/ndzfcf/` + jcqk_lb.value + '/' + jcqk_nd.value + '/' + xzqhdm.value + '/ndzfcf' });
+  }
+}
+
+//通知公告/法律法规
+function gotzgg() {
+  if (xxzx_lb.value == '1') {
+    //通知公告
+    go({ path: `/monitor/mynews` });
+  } else {
+    //法律法规
+    go({ path: `/jgyw/jyflfg` });
+  }
+}
+
+homeJcqk();
+homeQylx();
+homeXkxx();
+loadHomehead(hbGeo);
+homeBhgxm();
+//homeSndqk();
+//homeTzgg();
+</script>
+<style lang="less" scoped>
+.homeBody {
+  background-color: #EFEFF1;
+  padding: 10px
+}
+
+.gutter-box {
+  background: #FCFDFF;
+  padding: 5px;
+  width: 100%;
+}
+
+.gutter-head {
+  background: #FCFDFF;
+  height: 600px;
+}
+
+.qylx-title {
+  color: #01287F;
+  //styleName: 20B;
+  font-family: Source Han Sans CN;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 26px;
+  text-align: left;
+}
+
+.gutter-right {
+  width: 100%;
+  height: 295px;
+  background: #FCFDFF;
+}
+
+.gutter-right-top {
+  &:extend(.gutter-right);
+  margin-bottom: 5px;
+}
+
+.gutter-right-bottom {
+  &:extend(.gutter-right);
+  margin-top: 5px;
+}
+
+.gutter-bottom {
+  background: #FCFDFF;
+  height: 300px;
+}
+
+.jcqk-title {
+  //styleName: 16B;
+  font-family: Source Han Sans CN;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--text-text, #172135);
+}
+
+.jcqk-title-sl:extend(.jcqk-title) {
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.jcqk-nd-sl {
+  font-family: Source Han Sans CN;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 26px;
+  text-align: left;
+}
+
+.jcqk-name {
+  //styleName: 16R;
+  font-family: Source Han Sans CN;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: left;
+  color: var(---text-2, #696C73);
+}
+
+.jcqk-content {
+  font-family: Source Han Sans CN;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+  text-align: center;
+  color: #004DC2;
+}
+
+.jcqk-content-sm:extend(.jcqk-content) {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.jcqk-content-md:extend(.jcqk-content) {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.jcqk-qylx-bg {
+  border-radius: 8px 0px 0px 8px;
+  background: #EDF3FF;
+}
+
+.jcqk-border {
+  border-radius: 8px;
+  border: 1px solid var(--dialog-line-2, #D1D3D7);
+  -webkit-box-shadow: 0px 3px 3px #c8c8c8;
+  -moz-box-shadow: 0px 3px 3px #c8c8c8;
+  box-shadow: 0px 3px 3px #c8c8c8;
+}
+
+.list-content {
+  //styleName: 16R;
+  font-family: Source Han Sans CN;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: left;
+  overflow: hidden; //隐藏文字
+  text-overflow: ellipsis; //显示 ...
+  white-space: nowrap; //不换行
+  color: var(--text-text, #172135);
+}
+
+.list-content-index {
+  font-family: Source Han Sans CN;
+  font-size: 14px;
+  width: 24px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.06em;
+  text-align: center;
+  color: var(--text-text-5, #FFFFFF);
+}
+
+.list-content-date:extend(.list-content) {
+  color: var(--text-text-3, #8B909A);
+  width: 180px;
+  text-align: right;
+}
+
+.list-content-sl:extend(.list-content) {
+  color: var(--text-text, #172135);
+  font-weight: 600;
+  width: 40px;
+  margin-right: 8px;
+  text-align: right;
+}
+</style>
