@@ -1,0 +1,237 @@
+<template>
+  <!-- 单行分布模式 -->
+  <!-- <Header :class="getHeaderClass"> -->
+    <!-- left start -->
+    <!-- <div :class="`${prefixCls}-left`" v-if="!isEmbeddedMode"> -->
+      <!-- logo -->
+      <!-- <AppLogo v-if="getShowHeaderLogo || getIsMobile" :class="`${prefixCls}-logo`" :theme="getHeaderTheme" />
+      <LayoutTrigger v-if="(getShowContent && getShowHeaderTrigger && !getSplit && !getIsMixSidebar) || getIsMobile" :theme="getHeaderTheme" :sider="false" />
+      <LayoutBreadcrumb v-if="getShowContent && getShowBread" :theme="getHeaderTheme" />
+    </div> -->
+    <!-- left end -->
+
+    <!-- menu start -->
+    <!-- <div :class="`${prefixCls}-menu`" v-if="getShowTopMenu && !getIsMobile">
+      <LayoutMenu :isHorizontal="true" :theme="getHeaderTheme" :splitType="getSplitType" :menuMode="getMenuMode" />
+    </div> -->
+    <!-- menu-end -->
+
+    <!-- action  -->
+    <!-- <div :class="`${prefixCls}-action`" v-if="!isEmbeddedMode"> -->
+      <!-- <AppSearch :class="`${prefixCls}-action__item `" v-if="getShowSearch" />
+      <ErrorAction v-if="getUseErrorHandle" :class="`${prefixCls}-action__item error-action`" />
+      <Notify v-if="getShowNotice" :class="`${prefixCls}-action__item notify-item`" />
+      <FullScreen v-if="getShowFullScreen" :class="`${prefixCls}-action__item fullscreen-item`" />
+      <LockScreen v-if="getUseLockPage" />
+      <AppLocalePicker v-if="getShowLocalePicker" :reload="true" :showText="false" :class="`${prefixCls}-action__item`" />
+      <UserDropDown :theme="getHeaderTheme" /> -->
+      <!-- 设置 -->
+      <!-- <SettingDrawer v-if="getShowSetting" :class="`${prefixCls}-action__item`" /> -->
+    <!-- </div> -->
+  <!-- </Header> -->
+
+  <!-- 两行分布模式 -->
+  <div :class="getHeaderClass" >
+    <!-- 第一行：logo + 设置项 -->
+    <div :class="`${prefixCls}-top-row`"  v-if="!isEmbeddedMode">
+      <!-- 左侧：logo + 触发器 + 面包屑 -->
+      <div :class="`${prefixCls}-left`">
+        <AppLogo v-if="getShowHeaderLogo || getIsMobile" :class="`${prefixCls}-logo`" :theme="getHeaderTheme" />
+        <LayoutTrigger v-if="(getShowContent && getShowHeaderTrigger && !getSplit && !getIsMixSidebar) || getIsMobile" :theme="getHeaderTheme" :sider="false" />
+        <LayoutBreadcrumb v-if="getShowContent && getShowBread && !getSplit && !isEmbeddedMode" :theme="getHeaderTheme" />
+      </div>
+      
+      <!-- 右侧：设置项 -->
+      <div :class="`${prefixCls}-action`">
+        <AppSearch :class="`${prefixCls}-action__item `" v-if="getShowSearch" />
+        <ErrorAction v-if="getUseErrorHandle" :class="`${prefixCls}-action__item error-action`" />
+        <Notify v-if="getShowNotice" :class="`${prefixCls}-action__item notify-item`" />
+        <FullScreen v-if="getShowFullScreen" :class="`${prefixCls}-action__item fullscreen-item`" />
+        <LockScreen v-if="getUseLockPage" />
+        <AppLocalePicker v-if="getShowLocalePicker" :reload="true" :showText="false" :class="`${prefixCls}-action__item`" />
+        <UserDropDown :theme="getHeaderTheme" />
+        <!-- <SettingDrawer v-if="getShowSetting" :class="`${prefixCls}-action__item`" /> -->
+      </div>
+    </div>
+    
+    <!-- 第二行：导航菜单 -->
+    <div :class="`${prefixCls}-menu-row`" v-if="getShowTopMenu && !getIsMobile">
+      <LayoutMenu :isHorizontal="true" :theme="getHeaderTheme" :splitType="getSplitType" :menuMode="getMenuMode" />
+    </div>
+  </div>
+ 
+ <!-- 面包屑：有二级菜单时显示在内容区域 -->
+ <div :class="`${prefixCls}-breadcrumb-row`" v-if="getShowContent && getShowBread && (getSplit || isEmbeddedMode) && !getIsMobile">
+   <LayoutBreadcrumb :theme="getHeaderTheme" />
+ </div>
+  <LoginSelect ref="loginSelectRef" @success="loginSelectOk"></LoginSelect>
+</template>
+<script lang="ts">
+  import { defineComponent, unref, computed, ref, onMounted, toRaw } from 'vue';
+
+  import { propTypes } from '/@/utils/propTypes';
+
+  import { Layout } from 'ant-design-vue';
+  import { AppLogo } from '/@/components/Application';
+  import LayoutMenu from '../menu/index.vue';
+  import LayoutTrigger from '../trigger/index.vue';
+
+  import { AppSearch } from '/@/components/Application';
+
+  import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
+  import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
+  import { useRootSetting } from '/@/hooks/setting/useRootSetting';
+
+  import { MenuModeEnum, MenuSplitTyeEnum } from '/@/enums/menuEnum';
+  import { SettingButtonPositionEnum } from '/@/enums/appEnum';
+  import { AppLocalePicker } from '/@/components/Application';
+
+  import { UserDropDown, LayoutBreadcrumb, FullScreen, Notify, ErrorAction, LockScreen } from './components';
+  import { useAppInject } from '/@/hooks/web/useAppInject';
+  import { useDesign } from '/@/hooks/web/useDesign';
+
+  import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
+  import { useLocale } from '/@/locales/useLocale';
+
+  import LoginSelect from '/@/views/sys/login/LoginSelect.vue';
+  import { useUserStore } from '/@/store/modules/user';
+  import { useIframeStore } from '/@/store/modules/iframe';
+
+  export default defineComponent({
+    name: 'LayoutHeader',
+    components: {
+      Header: Layout.Header,
+      AppLogo,
+      LayoutTrigger,
+      LayoutBreadcrumb,
+      LayoutMenu,
+      UserDropDown,
+      AppLocalePicker,
+      FullScreen,
+      Notify,
+      AppSearch,
+      ErrorAction,
+      LockScreen,
+      LoginSelect,
+      SettingDrawer: createAsyncComponent(() => import('/@/layouts/default/setting/index.vue'), {
+        loading: true,
+      }),
+    },
+    props: {
+      fixed: propTypes.bool,
+    },
+    setup(props) {
+      const { prefixCls } = useDesign('layout-header');
+      const userStore = useUserStore();
+      const iframeStore = useIframeStore();
+      const { getShowTopMenu, getShowHeaderTrigger, getSplit, getIsMixMode, getMenuWidth, getIsMixSidebar } = useMenuSetting();
+      const { getUseErrorHandle, getShowSettingButton, getSettingButtonPosition } = useRootSetting();
+
+      const { getHeaderTheme, getShowFullScreen, getShowNotice, getShowContent, getShowBread, getShowHeaderLogo, getShowHeader, getShowSearch, getUseLockPage } = useHeaderSetting();
+
+      const { getShowLocalePicker } = useLocale();
+
+      const { getIsMobile } = useAppInject();
+
+      // 使用iframe store的状态
+      const isEmbeddedMode = computed(() => unref(iframeStore.isIframeMode));
+
+      const getHeaderClass = computed(() => {
+        const theme = unref(getHeaderTheme);
+        return [
+          prefixCls,
+          {
+            [`${prefixCls}--fixed`]: props.fixed,
+            [`${prefixCls}--mobile`]: unref(getIsMobile),
+            [`${prefixCls}--${theme}`]: theme,
+            [`${prefixCls}--iframe-mode`]: unref(isEmbeddedMode),
+          },
+        ];
+      });
+
+      const getShowSetting = computed(() => {
+        if (!unref(getShowSettingButton)) {
+          return false;
+        }
+        const settingButtonPosition = unref(getSettingButtonPosition);
+
+        if (settingButtonPosition === SettingButtonPositionEnum.AUTO) {
+          return unref(getShowHeader);
+        }
+        return settingButtonPosition === SettingButtonPositionEnum.HEADER;
+      });
+
+      const getLogoWidth = computed(() => {
+        if (!unref(getIsMixMode) || unref(getIsMobile)) {
+          return {};
+        }
+        const width = unref(getMenuWidth) < 180 ? 180 : unref(getMenuWidth);
+        return { width: `${width}px` };
+      });
+
+      const getSplitType = computed(() => {
+        return unref(getSplit) ? MenuSplitTyeEnum.TOP : MenuSplitTyeEnum.NONE;
+      });
+
+      const getMenuMode = computed(() => {
+        return unref(getSplit) ? MenuModeEnum.HORIZONTAL : null;
+      });
+
+      /**
+       * 首页多租户部门弹窗逻辑
+       */
+      const loginSelectRef = ref();
+
+      function showLoginSelect() {
+        //update-begin---author:liusq  Date:20220101  for：判断登录进来是否需要弹窗选择租户----
+        //判断是否是登陆进来
+        const loginInfo = toRaw(userStore.getLoginInfo) || {};
+        if (!!loginInfo.isLogin) {
+          loginSelectRef.value.show(loginInfo);
+        }
+        //update-end---author:liusq  Date:20220101  for：判断登录进来是否需要弹窗选择租户----
+      }
+
+      function loginSelectOk() {
+        console.log('成功。。。。。');
+      }
+
+      onMounted(() => {
+        // 初始化iframe模式
+        iframeStore.initIframeMode();
+        showLoginSelect();
+      });
+
+      return {
+        prefixCls,
+        getHeaderClass,
+        getShowHeaderLogo,
+        getHeaderTheme,
+        getShowHeaderTrigger,
+        getIsMobile,
+        getShowBread,
+        getShowContent,
+        getSplitType,
+        getSplit,
+        getMenuMode,
+        getShowTopMenu,
+        getShowLocalePicker,
+        getShowFullScreen,
+        getShowNotice,
+        getUseErrorHandle,
+        getLogoWidth,
+        getIsMixSidebar,
+        getShowSettingButton,
+        getShowSetting,
+        getShowSearch,
+        getUseLockPage,
+        loginSelectOk,
+        loginSelectRef,
+        isEmbeddedMode,
+      };
+    },
+  });
+</script>
+<style lang="less">
+  @import './index.less';
+</style>

@@ -1,0 +1,55 @@
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+
+export const useIframeStore = defineStore('iframe', () => {
+  // iframe模式状态
+  const isIframeMode = ref(true);
+
+  // 设置iframe模式
+  function setIframeMode(mode: boolean) {
+    isIframeMode.value = mode;
+    // 保存到localStorage以持久化
+    sessionStorage.setItem('iframe-mode', mode.toString());
+  }
+
+  // 初始化iframe模式
+  function initIframeMode() {
+    // 1. 优先从URL参数读取（大屏项目设置）
+    const urlParams = new URLSearchParams(window.location.search);
+    const iframeParam = urlParams.get('iframe');
+    
+    if (iframeParam === 'true') {
+      isIframeMode.value = true;
+      sessionStorage.setItem('iframe-mode', 'true');
+      return;
+    }
+
+    // 3. 检测window.parent（自动检测是否在iframe中）
+    if (window.parent !== window) {
+      isIframeMode.value = true;
+      sessionStorage.setItem('iframe-mode', 'true');
+      return;
+    }
+
+    // 默认非iframe模式
+    isIframeMode.value = false;
+    sessionStorage.setItem('iframe-mode', 'false');
+  }
+
+  // 计算头部高度（与您当前的样式计算方式完全匹配）
+  const headerHeight = computed(() => {
+    // iframe模式下隐藏logo+名称，只显示一级菜单：70px
+    if (isIframeMode.value) {
+      return 70;
+    }
+    // 正常模式：logo行(70px) + 一级菜单行(70px) = 140px
+    return 140;
+  });
+
+  return {
+    isIframeMode,
+    setIframeMode,
+    initIframeMode,
+    headerHeight,
+  };
+}); 

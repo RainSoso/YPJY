@@ -36,8 +36,12 @@ export const LoginRoute: AppRouteRecordRaw = {
   },
   //本地开发注掉
   // beforeEnter: (to, from, next) => {
-  //   window.location.href = 'https://www.hubyjj.cn'; 
+  //   if (import.meta.env.PROD) {
+  //     window.location.href = 'https://www.hubyjj.cn';
+  //   } else {
+  //     next();
+  //   }
   // }
 };
 // Basic routing without permission
-export const basicRoutes = [ LoginRoute,RootRoute, ...mainOutRoutes, REDIRECT_ROUTE, PAGE_NOT_FOUND_ROUTE];
+export const basicRoutes = [LoginRoute, RootRoute, ...mainOutRoutes, REDIRECT_ROUTE, PAGE_NOT_FOUND_ROUTE];

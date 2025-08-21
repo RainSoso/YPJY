@@ -1,0 +1,44 @@
+.jeecg-basic-menu__sidebar-hor.ant-menu-horizontal {
+  margin-bottom: -12px;
+  font-size: 16px;
+}
+
+.jeecg-app-logo.light .jeecg-app-logo__title {
+  color: #000000 !important;
+}
+
+.ant-menu-horizontal {
+  border-bottom: none !important;
+}
+
+.jeecg-layout-header-menu-row {
+  border-bottom: none !important;
+}
+
+/* 中间菜单区域样式调整 */
+.jeecg-layout-header {
+  // height: 115px !important;
+  // line-height: 115px !important;
+  padding: 5px 20px 0 !important;
+  background: linear-gradient( #92b6fa 26.93%, #deecf9 99.29%);
+  // background:linear-gradient(  #cdddfc 26.93%, #2c8dee 99.29%);
+
+
+  .ant-menu {
+    justify-content: space-evenly;
+    background: none !important;
+    color: #081c5d !important;
+  }
+
+  /* 菜单项选中状态背景色 */
+  .ant-menu-item-selected {
+    background: linear-gradient( #d9e9ff 26.93%,  #f8fbff 99.29%);
+    // background: linear-gradient( #d3e7fb 26.93%,  #f2f3f4 99.29%);
+    // color: #081c5d  !important;
+    border-radius: 6px 6px 0 0;
+
+    &::after {
+      border-bottom: 0px solid #deecf9 !important;
+    }
+  }
+}
